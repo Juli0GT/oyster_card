@@ -43,25 +43,33 @@ describe Oystercard do
   end
 
   describe '#touch_in' do
+      let(:entry_station) {double :entry_station}
     it 'responds to touch in method' do
-      expect(oystercard).to respond_to(:touch_in)
+      expect(oystercard).to respond_to(:touch_in).with(1).argument
     end
 
     it 'can touch in' do
       oystercard.top_up(20)
-      oystercard.touch_in
+      oystercard.touch_in(entry_station)
       expect(oystercard).to be_in_journey
     end
 
     it 'raise an error when touch in and the balance is lower than minimum' do
-      expect{ oystercard.touch_in }.to raise_error "Insufficient balance to touch in"
+      expect{ oystercard.touch_in(entry_station) }.to raise_error "Insufficient balance to touch in"
+    end
+
+    it 'remembers the entry station after the touch in' do
+      oystercard.top_up(20)
+      oystercard.touch_in(entry_station)
+      expect(oystercard.touch_in(entry_station)).to eq(entry_station)
     end
   end
 
   describe '#touch_out' do
+    let(:entry_station) {double :entry_station}
     before do
       oystercard.top_up(20)
-      oystercard.touch_in
+      oystercard.touch_in(entry_station)
     end
 
     it 'responds to touch out method' do
@@ -72,7 +80,7 @@ describe Oystercard do
       oystercard.touch_out
       expect(oystercard).not_to be_in_journey
     end
-    
+
     it 'deducts a fare' do
       expect{oystercard.touch_out}.to change{oystercard.balance}.by(-Oystercard::MINIMUM_BALANCE)
     end
