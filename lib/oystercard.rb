@@ -11,4 +11,8 @@ attr_reader :balance, :limit
     raise 'Cannot top up over £90!' if @balance + amount >= @limit
     @balance += amount
   end
+
+  def deduct(amount)
+    @balance -= amount
+  end
 end
