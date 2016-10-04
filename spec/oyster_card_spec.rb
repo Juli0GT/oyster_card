@@ -19,7 +19,7 @@ describe Oystercard do
     it 'limits balance' do
       expect(oystercard.balance).to be <= oystercard.limit
     end
-    it 'raises an error when oystercard is full' do
+    it 'raises an error' do
       expect{oystercard.top_up(91)}.to raise_error 'Cannot top up over £90!'
     end
   end
@@ -30,6 +30,36 @@ describe Oystercard do
     end
     it 'deducts an amount from balance' do
       expect{ oystercard.deduct(1) }.to change {oystercard.balance}.by -1
+    end
+  end
+
+  describe '#in_journey' do
+    it 'responds to in journey method' do
+      expect(oystercard).to respond_to(:in_journey?)
+    end
+    it 'is initially not in journey' do
+      expect(oystercard).not_to be_in_journey
+    end
+  end
+
+  describe '#touch_in' do
+    it 'responds to touch in method' do
+      expect(oystercard).to respond_to(:touch_in)
+    end
+    it 'can touch in' do
+      oystercard.touch_in
+      expect(oystercard).to be_in_journey
+    end
+  end
+
+  describe '#touch_out' do
+    it 'responds to touch out method' do
+      expect(oystercard).to respond_to(:touch_out)
+    end
+    it 'can touch out' do
+      oystercard.touch_in
+      oystercard.touch_out
+      expect(oystercard).not_to be_in_journey
     end
   end
 end
