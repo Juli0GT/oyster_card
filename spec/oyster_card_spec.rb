@@ -24,14 +24,14 @@ describe Oystercard do
     end
   end
 
-  describe '#deduct' do
-    it 'responds to deduct method' do
-      expect(oystercard).to respond_to(:deduct).with(1).argument
-    end
-    it 'deducts an amount from balance' do
-      expect{ oystercard.deduct(1) }.to change {oystercard.balance}.by -1
-    end
-  end
+  # describe '#deduct' do
+  #   it 'responds to deduct method' do
+  #     expect(oystercard).to respond_to(:deduct).with(1).argument
+  #   end
+  #   it 'deducts an amount from balance' do
+  #     expect{ oystercard.deduct(1) }.to change {oystercard.balance}.by -1
+  #   end
+  # end
 
   describe '#in_journey' do
     it 'responds to in journey method' do
@@ -46,20 +46,35 @@ describe Oystercard do
     it 'responds to touch in method' do
       expect(oystercard).to respond_to(:touch_in)
     end
+
     it 'can touch in' do
+      oystercard.top_up(20)
       oystercard.touch_in
       expect(oystercard).to be_in_journey
+    end
+
+    it 'raise an error when touch in and the balance is lower than minimum' do
+      expect{ oystercard.touch_in }.to raise_error "Insufficient balance to touch in"
     end
   end
 
   describe '#touch_out' do
+    before do
+      oystercard.top_up(20)
+      oystercard.touch_in
+    end
+
     it 'responds to touch out method' do
       expect(oystercard).to respond_to(:touch_out)
     end
+
     it 'can touch out' do
-      oystercard.touch_in
       oystercard.touch_out
       expect(oystercard).not_to be_in_journey
+    end
+    
+    it 'deducts a fare' do
+      expect{oystercard.touch_out}.to change{oystercard.balance}.by(-Oystercard::MINIMUM_BALANCE)
     end
   end
 end
