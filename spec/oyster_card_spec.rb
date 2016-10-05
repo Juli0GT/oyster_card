@@ -2,8 +2,21 @@ require './lib/oystercard.rb'
 
 describe Oystercard do
   subject(:oystercard) {described_class.new}
+  let(:entry_station) {double :entry_station}
+  let(:exit_station) {double :exit_station}
   it 'has a balance of zero' do
     expect(oystercard.balance).to eq 0
+  end
+
+  it 'has no journeys' do
+    expect(oystercard.journeys).to eq []
+  end
+
+  it 'checks that touch-in and touch out creates a journey' do
+    oystercard.top_up(20)
+    oystercard.touch_in(entry_station)
+    oystercard.touch_out(exit_station)
+    expect(oystercard.journeys).to eq  [{:entry_station => entry_station, :exit_station => exit_station}]
   end
 
   describe "#top_up" do
@@ -24,15 +37,6 @@ describe Oystercard do
     end
   end
 
-  # describe '#deduct' do
-  #   it 'responds to deduct method' do
-  #     expect(oystercard).to respond_to(:deduct).with(1).argument
-  #   end
-  #   it 'deducts an amount from balance' do
-  #     expect{ oystercard.deduct(1) }.to change {oystercard.balance}.by -1
-  #   end
-  # end
-
   describe '#in_journey' do
     it 'responds to in journey method' do
       expect(oystercard).to respond_to(:in_journey?)
@@ -43,7 +47,6 @@ describe Oystercard do
   end
 
   describe '#touch_in' do
-      let(:entry_station) {double :entry_station}
     it 'responds to touch in method' do
       expect(oystercard).to respond_to(:touch_in).with(1).argument
     end
@@ -66,23 +69,18 @@ describe Oystercard do
   end
 
   describe '#touch_out' do
-    let(:entry_station) {double :entry_station}
     before do
       oystercard.top_up(20)
       oystercard.touch_in(entry_station)
     end
 
-    it 'responds to touch out method' do
-      expect(oystercard).to respond_to(:touch_out)
-    end
-
     it 'can touch out' do
-      oystercard.touch_out
+      oystercard.touch_out(exit_station)
       expect(oystercard).not_to be_in_journey
     end
 
     it 'deducts a fare' do
-      expect{oystercard.touch_out}.to change{oystercard.balance}.by(-Oystercard::MINIMUM_BALANCE)
+      expect{oystercard.touch_out(exit_station)}.to change{oystercard.balance}.by(-Oystercard::MINIMUM_BALANCE)
     end
   end
 end
