@@ -7,7 +7,6 @@ attr_reader :balance, :limit, :in_journey, :minimum, :entry_station
     @limit = limit
     @minimum = minimum
     @balance = 0
-    @in_journey = false
     @entry_station = nil
   end
 
@@ -17,18 +16,19 @@ attr_reader :balance, :limit, :in_journey, :minimum, :entry_station
   end
 
   def in_journey?
-    !!entry_station
+    !!@entry_station
   end
 
   def touch_in(entry_station)
     raise "Insufficient balance to touch in" if @balance < @minimum
-    @in_journey = true
     @entry_station = entry_station
+    @exit_station = nil
   end
 
-  def touch_out
+  def touch_out(exit_station)
     deduct(@minimum)
     @entry_station = nil
+    @exit_station = exit_station
   end
 
   private
