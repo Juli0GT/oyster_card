@@ -21,6 +21,10 @@ describe Journey do
     it 'calculates the fare of the journey' do
       expect(journey).to respond_to(:fare)
     end
+
+    it 'returns penalty fare when entry_station is nil' do
+    
+    end
   end
 
   describe '#journey_complete' do

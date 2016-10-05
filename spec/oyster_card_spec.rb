@@ -56,7 +56,7 @@ describe Oystercard do
     it 'starts the new journey' do
         oystercard.top_up(20)
         oystercard.touch_in(entry_station)
-        expect(oystercard.touch_in(entry_station)).to eq(oystercard.new_journey)
+        expect(oystercard.touch_in(entry_station)).to eq(Journey.new(entry_station))
       end
     end
 
@@ -71,9 +71,9 @@ describe Oystercard do
       expect(oystercard).not_to be_in_journey
     end
 
-    it 'forgets the entry station after the touch out' do
+    it 'completes a journey at the exit station' do
       oystercard.touch_out(exit_station)
-      expect(oystercard.entry_station).to eq nil
+      expect(oystercard.touch_out(exit_station)).to eq(oystercard.new_journey)
     end
 
     it 'deducts a fare' do
