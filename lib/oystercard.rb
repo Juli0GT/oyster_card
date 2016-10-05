@@ -1,13 +1,13 @@
 class Oystercard
 MAXIMUM_LIMIT = 90
 MINIMUM_BALANCE = 1
-attr_reader :balance, :limit, :in_journey, :minimum, :entry_station, :journeys
+attr_reader :balance, :limit, :in_journey, :minimum, :entry_station, :journeys, :new_journey
 
   def initialize(limit=MAXIMUM_LIMIT, minimum=MINIMUM_BALANCE)
     @limit = limit
     @minimum = minimum
     @balance = 0
-    #@entry_station = nil
+    @new_journey = nil
     @journeys = []
   end
 
@@ -23,6 +23,7 @@ attr_reader :balance, :limit, :in_journey, :minimum, :entry_station, :journeys
   def touch_in(entry_station)
     raise "Insufficient balance to touch in" if @balance < @minimum
     @entry_station = entry_station
+    @new_journey = Journey.new
   end
 
   def touch_out(exit_station)

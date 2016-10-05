@@ -4,6 +4,7 @@ describe Oystercard do
   subject(:oystercard) {described_class.new}
   let(:entry_station) {double :entry_station}
   let(:exit_station) {double :exit_station}
+  let(:new_journey) {double :new_journey}
   let(:journey) {{:entry_station => entry_station, :exit_station => exit_station}}
 
   it 'has a balance of zero' do
@@ -52,12 +53,12 @@ describe Oystercard do
       expect{ oystercard.touch_in(entry_station) }.to raise_error "Insufficient balance to touch in"
     end
 
-    it 'remembers the entry station after the touch in' do
-      oystercard.top_up(20)
-      oystercard.touch_in(entry_station)
-      expect(oystercard.touch_in(entry_station)).to eq(entry_station)
+    it 'starts the new journey' do
+        oystercard.top_up(20)
+        oystercard.touch_in(entry_station)
+        expect(oystercard.touch_in(entry_station)).to eq(oystercard.new_journey)
+      end
     end
-  end
 
   describe '#touch_out' do
     before do
