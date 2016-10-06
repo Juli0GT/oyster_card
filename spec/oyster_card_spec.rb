@@ -6,7 +6,7 @@ describe Oystercard do
   let(:entry_station) {double :station}
   let(:exit_station) {double :station}
   let(:new_journey) {double :new_journey}
-  let(:journey) {double :journey}
+  #let(:journey) {double :journey, start:
   # let{:journey2} {Journey.new}
 
   it 'has a balance of zero' do
