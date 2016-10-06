@@ -1,12 +1,19 @@
+require 'station'
+require 'journey'
+
 class Oystercard
 MAXIMUM_LIMIT = 90
 MINIMUM_BALANCE = 1
+PENALTY_FARE = 6
+BALANCE = 0
 attr_reader :balance, :limit, :in_journey, :minimum, :entry_station, :journeys, :new_journey
 
-  def initialize(limit=MAXIMUM_LIMIT, minimum=MINIMUM_BALANCE)
-    @limit = limit
-    @minimum = minimum
-    @balance = 0
+  def initialize(balance: BALANCE, journey: Journey)
+    @limit = MAXIMUM_LIMIT
+    @minimum = MINIMUM_BALANCE
+    @balance = balance
+    @journey_class
+    @current_journey = nil
     @journeys = []
   end
 
@@ -15,17 +22,12 @@ attr_reader :balance, :limit, :in_journey, :minimum, :entry_station, :journeys, 
     @balance += amount
   end
 
-  def in_journey?
-    !!entry_station
-  end
+  # def in_journey?
+  #   !!entry_station
+  # end
 
   def touch_in(entry_station)
-    clear_single_journey
-    @new_journey[:entry_station, :entry_zone] = station.name, station.zone
-    @new_journey[:entry]
-    raise "Insufficient balance to touch in" if @balance < @minimum
-    @entry_station = entry_station
-    #@new_journey = Journey.new(entry_station)
+    check_balance
   end
 
   def touch_out(exit_station)
@@ -35,13 +37,14 @@ attr_reader :balance, :limit, :in_journey, :minimum, :entry_station, :journeys, 
     @new_journey = nil
   end
 
-  def clear_single_journey
-    @new_journey {entry_station: nil, entry_zone: nil, exit_station: nil, exit_zone: nil}
-  end
 
   private
 
   def deduct(amount)
     @balance -= amount
+  end
+
+  def check_balance
+    fail "Insufficient balance to touch in" if @balance < 1
   end
 end
