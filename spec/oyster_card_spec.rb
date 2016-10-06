@@ -56,7 +56,7 @@ describe Oystercard do
     it 'starts the new journey' do
         oystercard.top_up(20)
         oystercard.touch_in(entry_station)
-        expect(oystercard.touch_in(entry_station)).to eq(Journey.new(entry_station))
+        expect(oystercard.touch_in(entry_station)).to eq(oystercardcard.new_journey)
       end
     end
 

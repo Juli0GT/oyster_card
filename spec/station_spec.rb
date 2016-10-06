@@ -1,11 +1,11 @@
 require 'station'
 
 describe Station do
-  subject(:station) {described_class.new(name: "Old Street", zone: 1)}
+  subject(:station) {described_class.new(name: 'Bank', zone: 1)}
 
 
   it 'initalizes with station name' do
-    expect(station.name).to eq("Old Street")
+    expect(station.name).to eq("Bank")
   end
 
   it 'intitalizes with zone number' do

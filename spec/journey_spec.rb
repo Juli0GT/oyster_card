@@ -5,11 +5,6 @@ describe Journey do
   subject(:journey) {described_class.new}
   let(:oystercard) {double :oystercard}
 
-  describe '#start_journey' do
-   it 'gets started' do
-     expect(journey).to respond_to(:start)
-   end
-  end
 
   describe '#finish_journey' do
     it 'finishes the journey' do
@@ -23,7 +18,7 @@ describe Journey do
     end
 
     it 'returns penalty fare when entry_station is nil' do
-    
+
     end
   end
 
