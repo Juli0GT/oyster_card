@@ -10,8 +10,8 @@ attr_reader :balance, :limit, :minimum, :station, :journeys, :journey
     @limit = MAXIMUM_LIMIT
     @minimum = MINIMUM_BALANCE
     @balance = 0
-    @journey = Journey.new
     @journeys = []
+    @in_use = false
     #@station = Station.new
   end
 
@@ -20,19 +20,23 @@ attr_reader :balance, :limit, :minimum, :station, :journeys, :journey
     @balance += amount
   end
 
-  # def in_journey?
-  #   !!entry_station
-  # end
+  def in_journey?
+    @in_use
+  end
 
   def touch_in(entry_station)
     raise "Insufficient balance to touch in" if @balance < @minimum
+    @journey = Journey.new
     @journey.start(entry_station)
+    @in_use = true
   end
 
   def touch_out(exit_station)
     deduct(@minimum)
     # @journeys << {:entry_station => entry_station, :exit_station => exit_station }
     @journey.finish(exit_station)
+    @in_use = false
+    journey_logger
   end
 
   private
@@ -40,5 +44,9 @@ attr_reader :balance, :limit, :minimum, :station, :journeys, :journey
 
   def deduct(amount)
     @balance -= amount
+  end
+
+  def journey_logger
+    @journeys << @journey
   end
 end
