@@ -4,7 +4,7 @@ require_relative 'station'
 class Oystercard
 MAXIMUM_LIMIT = 90
 MINIMUM_BALANCE = 1
-attr_reader :balance, :limit, :minimum, :station, :journeys, :journey
+attr_reader :balance, :limit, :minimum, :station, :journeys, :journey, :in_use
 
   def initialize
     @limit = MAXIMUM_LIMIT
@@ -12,6 +12,7 @@ attr_reader :balance, :limit, :minimum, :station, :journeys, :journey
     @balance = 0
     @journeys = []
     @in_use = false
+    #@journey = Journey.new
     #@station = Station.new
   end
 
@@ -26,15 +27,17 @@ attr_reader :balance, :limit, :minimum, :station, :journeys, :journey
 
   def touch_in(entry_station)
     raise "Insufficient balance to touch in" if @balance < @minimum
+    deduct(@journey.fare) if in_journey?
     @journey = Journey.new
     @journey.start(entry_station)
     @in_use = true
   end
 
   def touch_out(exit_station)
-    deduct(@minimum)
+    @journey = Journey.new if @journey == nil
     # @journeys << {:entry_station => entry_station, :exit_station => exit_station }
     @journey.finish(exit_station)
+    deduct(@journey.fare)
     @in_use = false
     journey_logger
   end
@@ -47,6 +50,8 @@ attr_reader :balance, :limit, :minimum, :station, :journeys, :journey
   end
 
   def journey_logger
-    @journeys << @journey
+    @journeys << @journey.dup
+    @journey = nil
   end
+
 end

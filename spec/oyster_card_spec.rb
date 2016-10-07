@@ -35,24 +35,17 @@ describe Oystercard do
     end
   end
 
-  describe '#in_journey' do
-    it 'responds to in journey method' do
-      expect(oystercard).to respond_to(:in_journey?)
-    end
-  end
-
   describe '#touch_in' do
     it 'raise an error when touch in and the balance is lower than minimum' do
       expect{ oystercard.touch_in(entry_station) }.to raise_error "Insufficient balance to touch in"
     end
-  end
 
-    # it 'starts the new journey' do
-    #     oystercard.top_up(20)
-    #     oystercard.touch_in(Station.new)
-    #     expect(oystercard.journey).to eq({entry_station:"Bank", entry_zone: 1, exit_station: nil, exit_zone: nil })
-    #   end
-    # end
+    it 'deducts penalty fare if touch in twice' do
+      oystercard.top_up(20)
+      oystercard.touch_in(entry_station)
+      expect{oystercard.touch_in(entry_station)}.to change{oystercard.balance}.by(-Oystercard::PENALTY_FARE)
+    end
+  end
 
   describe '#touch_out' do
     before do
@@ -60,14 +53,13 @@ describe Oystercard do
       oystercard.touch_in(entry_station)
     end
 
-    it 'completes in journey at touch out' do
-      oystercard.touch_out(exit_station)
-      expect(oystercard).not_to be_in_journey
-    end
-
-
     it 'deducts a fare' do
       expect{oystercard.touch_out(exit_station)}.to change{oystercard.balance}.by(-Oystercard::MINIMUM_BALANCE)
+    end
+
+    it 'deducts a penalty fare if touch ou twice' do
+      oystercard.touch_out(exit_station)
+      expect{oystercard.touch_out(exit_station)}.to change{oystercard.balance}.by(-Oystercard::PENALTY_FARE)
     end
   end
 end
