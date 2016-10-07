@@ -1,6 +1,3 @@
-require_relative 'oystercard'
-require_relative 'station'
-
 MINIMUM_FARE = 1
 PENALTY_FARE = 6
 
@@ -23,10 +20,14 @@ class Journey
   end
 
   def fare
-    complete_journey? ? MINIMUM_FARE : PENALTY_FARE
+    complete_journey? ?  zone_fare : PENALTY_FARE
   end
 
   def complete_journey?
     !(@journey[:entry_station] && @journey[:exit_station]).nil?
+  end
+
+  def zone_fare
+    ((@journey[:exit_zone] - @journey[:entry_zone]).abs + 1)
   end
 end

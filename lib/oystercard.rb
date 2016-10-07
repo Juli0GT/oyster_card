@@ -1,5 +1,6 @@
 require_relative 'journey'
 require_relative 'station'
+require_relative 'journey_log'
 
 class Oystercard
 MAXIMUM_LIMIT = 90
@@ -7,13 +8,13 @@ MINIMUM_BALANCE = 1
 attr_reader :balance, :limit, :minimum, :station, :journeys, :journey, :in_use
 
   def initialize
-    @limit = MAXIMUM_LIMIT
-    @minimum = MINIMUM_BALANCE
     @balance = 0
-    @journeys = []
     @in_use = false
-    #@journey = Journey.new
-    #@station = Station.new
+    @journey_logger = JourneyLogger.new
+  end
+
+  def in_journey?
+    @in_use
   end
 
   def top_up(amount)
@@ -21,25 +22,18 @@ attr_reader :balance, :limit, :minimum, :station, :journeys, :journey, :in_use
     @balance += amount
   end
 
-  def in_journey?
-    @in_use
-  end
 
   def touch_in(entry_station)
-    raise "Insufficient balance to touch in" if @balance < @minimum
-    deduct(@journey.fare) if in_journey?
-    @journey = Journey.new
-    @journey.start(entry_station)
+    raise "Insufficient balance to touch in" if @balance < MINIMUM_BALANCE
+    journey_start(entry_station)
     @in_use = true
   end
 
   def touch_out(exit_station)
     @journey = Journey.new if @journey == nil
-    # @journeys << {:entry_station => entry_station, :exit_station => exit_station }
-    @journey.finish(exit_station)
-    deduct(@journey.fare)
+    record_journey(exit_station)
+    @journey = nil
     @in_use = false
-    journey_logger
   end
 
   private
@@ -49,9 +43,22 @@ attr_reader :balance, :limit, :minimum, :station, :journeys, :journey, :in_use
     @balance -= amount
   end
 
-  def journey_logger
-    @journeys << @journey.dup
-    @journey = nil
+  def complete
+    deduct(@journey.fare)
   end
 
+  def journey_start(entry_station)
+    if in_journey?
+      complete
+      @journey_logger.record_journey(@journey)
+    end
+      @journey = Journey.new
+      @journey.start(entry_station)
+      @journey_logger.record_journey(entry_station)
+  end
+
+  def record_journey(exit_station)
+    @journey_logger.record_journey(@journey.finish(exit_station))
+    complete
+  end
 end
